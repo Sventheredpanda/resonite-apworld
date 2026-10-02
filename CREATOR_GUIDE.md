@@ -59,34 +59,51 @@ stuff at the end all you like, but don't shuffle what's there.
 
 ## Half 2: wire up your world
 
-Drop the universal client into your world. Then hook up three things:
+Drop the universal client into your world. Everything crosses between your
+world and the client as tagged impulses: one side fires a **Dynamic Impulse
+Trigger With Data**, the other catches it with a **Dynamic Impulse Receiver
+With Data** set to the same tag. No direct references, nothing breaks when you
+rearrange your world.
 
 **Checks.** Every location in your definition needs a moment in the world: a
 chest opening, a button pressed, a zone walked into. When that moment happens,
-hand the location's *exact name* to the client's check input.
+fire a Dynamic Impulse Trigger With Data with the tag `AP/CheckFound` and the
+location's *exact name* as the data (a string).
 
 Exact means exact. "Tower - Summit Beacon" is not "tower - summit beacon".
 Copy-paste the names straight from your definition. This is the step everyone
 messes up, so when something doesn't work, check the names first. It's always
 the names.
 
-**Items.** When the client receives an item, it hands your world the item's
-name — that's all it does. *You* decide what each name means in your world:
-spawn the Lantern in the player's hand, flash the screen red for a trap, play
-a little fanfare. Think of it as the client shouting "Lantern!" and your world
-deciding what "Lantern!" does.
-
-(The exact node/variable names for the client's check input and item output
-ship with the client itself — this guide covers what to connect, not the node
-names.)
+**Items.** When the client receives an item, it fires a Dynamic Impulse
+Trigger With Data with the tag `AP/ItemReceived` and the item's name as the
+data. In your world, add a Dynamic Impulse Receiver With Data, set its tag to
+`AP/ItemReceived`, and decide what each name does: spawn the Lantern in the
+player's hand, flash the screen red for a trap, play a little fanfare. The
+client shouts "Lantern!" — your world decides what "Lantern!" means.
 
 **Winning.** Nothing to do. When the check matching your victory location goes
 in, the client tells Archipelago the game is beaten.
 
 **DeathLink (optional).** If you enabled it in your definition, there are two
-wires: when your player dies, tell the client so it can pass the death on; when
-the client reports someone else's death, kill your player. That's the whole
-loop. Same idea works for trap effects.
+wires: when your player dies, fire `AP/PlayerDied` (put what killed them in the
+data, or leave it blank); when you catch `AP/DeathReceived`, kill your player.
+The data on `AP/DeathReceived` is the name of the slot the death came from —
+handy for announcing it. Trap effects work the same way through
+`AP/TrapReceived`.
+
+### All the tags in one place
+
+Your world fires, the client listens:
+
+- `AP/CheckFound` — data: location name (string). "The player found this check."
+- `AP/PlayerDied` — data: cause of death (string, optional). "Pass my death on."
+
+The client fires, your world listens:
+
+- `AP/ItemReceived` — data: item name (string).
+- `AP/DeathReceived` — data: the slot name the death came from (string).
+- `AP/TrapReceived` — data: trap name (string).
 
 ## When something doesn't work
 
