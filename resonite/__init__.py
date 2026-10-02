@@ -34,6 +34,9 @@ class ResoniteWorld(World):
     topology_present = True
     data_version = 1
 
+    # Placeholder entry for the static datapackage (see get_data_package_data).
+    _DATAPACKAGE_PLACEHOLDER = "(per-world names live in slot_data)"
+
     # Empty placeholders: the world metaclass requires these at class level.
     # The real tables are built per-slot in generate_early() from the YAML
     # definition and stored as instance attributes, shadowing these.
@@ -131,6 +134,31 @@ class ResoniteWorld(World):
 
     def get_filler_item_name(self) -> str:
         return self.definition["filler_item"]
+
+    @classmethod
+    def get_data_package_data(cls) -> dict:
+        # The real name<->ID tables are per-slot: built in generate_early()
+        # from the player YAML and shipped to the client via slot_data. There
+        # is no meaningful static datapackage for this game, but we must still
+        # ship one entry per map because:
+        #  1. archipelago.gg validates every game's datapackage on upload, and
+        #     its schema rejects empty maps ("Missing key: <class 'str'>");
+        #  2. the live server requires the game to be present in the multidata
+        #     datapackage (it has no installed copy of this apworld to fall
+        #     back to).
+        # The placeholder is never used in gameplay. Generic name-resolving
+        # clients (e.g. Universal Tracker) are not supported for this game;
+        # the universal in-world client reads the real tables from slot_data.
+        from worlds.AutoWorld import data_package_checksum
+        res = {
+            # sorted alphabetically (required by data_package_checksum)
+            "item_name_groups": {"Everything": []},
+            "item_name_to_id": {cls._DATAPACKAGE_PLACEHOLDER: 1},
+            "location_name_groups": {"Everywhere": []},
+            "location_name_to_id": {cls._DATAPACKAGE_PLACEHOLDER: 1},
+        }
+        res["checksum"] = data_package_checksum(res)
+        return res
 
     def fill_slot_data(self) -> Dict[str, object]:
         # The universal in-world client reads everything it needs from here,
