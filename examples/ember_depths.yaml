@@ -1,0 +1,40 @@
+# Ember Depths — second example world. Used to prove two different Resonite
+# definitions can live in the same multiworld.
+name: EmberPlayer
+game: Resonite
+
+Resonite:
+  world_definition: |
+    display_name: Ember Depths
+    filler_item: Ash Flake
+    death_link: false
+
+    items:
+      Heat Suit: { progression: true }
+      Magma Key: { progression: true }
+      Cool Drink: {}
+      Eruption: { trap: true }
+
+    regions:
+      Overlook:
+        starting: true
+        connects_to: [Magma Tubes]
+      Magma Tubes:
+        connects_to: [Overlook, Core Chamber]
+        requires: "|Heat Suit|"
+      Core Chamber:
+        connects_to: [Magma Tubes]
+        requires: "|Magma Key|"
+
+    locations:
+      - name: Overlook - Vista Point
+        region: Overlook
+      - name: Overlook - Supply Cache
+        region: Overlook
+      - name: Tubes - Cooling Vent
+        region: Magma Tubes
+      - name: Core - Reactor Console
+        region: Core Chamber
+      - name: Core - Heart of the Mountain
+        region: Core Chamber
+        victory: true

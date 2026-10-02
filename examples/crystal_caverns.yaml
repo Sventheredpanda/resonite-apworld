@@ -1,0 +1,54 @@
+# Crystal Caverns — example Resonite player YAML.
+# The world definition lives right here, in world_definition.
+# Put this file in your Archipelago installation's Players folder and generate.
+name: CavernPlayer
+game: Resonite
+
+Resonite:
+  world_definition: |
+    display_name: Crystal Caverns
+    filler_item: Shiny Pebble
+    death_link: true
+
+    items:
+      Lantern: { progression: true }
+      Climbing Pick: { progression: true }
+      Diving Bell: { progression: true }
+      Warm Socks: {}
+      Cave-in: { trap: true }
+
+    regions:
+      Base Camp:
+        starting: true
+        connects_to: [Crystal Caves]
+      Crystal Caves:
+        connects_to: [Base Camp, Sunken Grotto, Sky Tower]
+        requires: "|Lantern|"
+      Sunken Grotto:
+        connects_to: [Crystal Caves]
+        requires: "|Diving Bell|"
+      Sky Tower:
+        connects_to: [Crystal Caves]
+        requires: "|Climbing Pick| and |Lantern|"
+
+    locations:
+      - name: Base Camp - Supply Tent
+        region: Base Camp
+      - name: Base Camp - Notice Board
+        region: Base Camp
+      - name: Caves - Mushroom Ledge
+        region: Crystal Caves
+      - name: Caves - Crystal Cluster
+        region: Crystal Caves
+      - name: Caves - Echo Chamber
+        region: Crystal Caves
+        requires: "|Climbing Pick|"
+      - name: Grotto - Sunken Chest
+        region: Sunken Grotto
+      - name: Grotto - Pearl Oyster
+        region: Sunken Grotto
+      - name: Tower - Midway Balcony
+        region: Sky Tower
+      - name: Tower - Summit Beacon
+        region: Sky Tower
+        victory: true
